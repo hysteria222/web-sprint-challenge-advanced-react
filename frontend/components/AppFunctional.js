@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 
 // Suggested initial states
 const initialMessage = ''
@@ -13,15 +14,15 @@ export default function AppFunctional(props) {
   // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
   // You can delete them and build your own logic from scratch.
   const [b, setB] = useState(initialIndex)
+  const [steps, setSteps] = useState(initialSteps)
+  const [email, setEmail] = useState(initialEmail)
+  const x = (b % gridWidth) + 1;
+  const y = Math.floor(b / gridWidth) + 1;
+  const [message, setMessage] = useState(initialMessage)
 
   function getXY() {
-    const x = (b % gridWidth) + 1;
-    const y = Math.floor(b / gridWidth) + 1;
-    console.log(x,y)
     return [x, y];
   }
-
-
 
   function getXYMessage() {
     // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
@@ -29,7 +30,6 @@ export default function AppFunctional(props) {
     // returns the fully constructed string.
     return `Coordinates ${getXY()}`
   }
-  
 
   function reset() {
     setB(initialIndex)
@@ -57,7 +57,9 @@ export default function AppFunctional(props) {
     return newIndex;
   }
   
-
+  function incSteps() {
+    setSteps(steps => steps + 1)
+  }
 
   function move(evt) {
     // This event handler can use the helper above to obtain a new index for the "B",
@@ -69,23 +71,31 @@ export default function AppFunctional(props) {
     setB(newIndex)
   }
 
-
-  
   function onChange(evt) {
-    // You will need this to update the value of the input.
+    evt.preventDefault()
+    const value = evt.target.value 
+    setEmail(value)
+    console.log(email)
   }
+
+  const payload = { "x": x, "y": y, "steps": steps, "email": email}
 
   function onSubmit(evt) {
     // Use a POST request to send a payload to the server.
+   evt.preventDefault()
+   axios.post('http://localhost:9000/api/result', payload)
+    .then(res => setMessage(res.data.message))
+    .catch(err => setMessage(err.message))
+    console.log(message)
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">{getXYMessage()}</h3>
-        <h3 id="steps">You moved 0 times</h3>
+        <h3 id="steps">You moved {steps} times</h3>
       </div>
-      <div id="grid">
+      <div id="grid" >
         {
           gridArray.map(idx => (
             <div key={idx} className={`square${idx === b ? ' active' : ''}`}>
@@ -95,18 +105,18 @@ export default function AppFunctional(props) {
         }
       </div>
       <div className="info">
-        <h3 id="message"></h3>
+        <h3 id="message">{message}</h3>
       </div>
-      <div id="keypad">
+      <div id="keypad" onClick={incSteps}>
         <button id="left" onClick={move}>LEFT</button>
         <button id="up" onClick={move}>UP</button>
         <button id="right" onClick={move}>RIGHT</button>
         <button id="down" onClick={move}>DOWN</button>
         <button id="reset" onClick={reset}>reset</button>
       </div>
-      <form>
-        <input id="email" type="email" placeholder="type email"></input>
-        <input id="submit" type="submit"></input>
+      <form onSubmit={onSubmit}>
+        <input id="email" type="email" placeholder="type email" onChange={onChange}></input>
+        <input id="submit" type="submit" ></input>
       </form>
     </div>
   )
