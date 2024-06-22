@@ -28,7 +28,7 @@ export default function AppFunctional(props) {
     // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
     // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
     // returns the fully constructed string.
-    return `Coordinates ${getXY()}`
+    return `${getXY()}`
   }
 
   function reset() {
@@ -85,14 +85,14 @@ export default function AppFunctional(props) {
    evt.preventDefault()
    axios.post('http://localhost:9000/api/result', payload)
     .then(res => setMessage(res.data.message))
-    .catch(err => setMessage(err.message))
+    .catch(err => setMessage(err.response.data.message))
     console.log(message)
   }
 
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">{getXYMessage()}</h3>
+        <h3 id="coordinates">Coordinates {getXYMessage()}</h3>
         <h3 id="steps">You moved {steps} times</h3>
       </div>
       <div id="grid" >
