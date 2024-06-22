@@ -106,10 +106,10 @@ export default function AppFunctional(props) {
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates {getXYMessage()}</h3>
+        <h3 id="coordinates" data-testid="coordinates">Coordinates {getXYMessage()}</h3>
         <h3 id="steps">{stepGracefully()}</h3>
       </div>
-      <div id="grid" >
+      <div id="grid">
         {
           gridArray.map(idx => (
             <div key={idx} className={`square${idx === b ? ' active' : ''}`}>
